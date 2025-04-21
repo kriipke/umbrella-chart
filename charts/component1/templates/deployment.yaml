@@ -1,0 +1,30 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+spec:
+  {{- if eq .Values.podCount.type "static" }}
+  replicas: {{ .Values.podCount.static }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      # https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/
+      {{- if .Values.troubleshootingContainer }}
+      shareProcessNamespace: true
+      {{- end }}
+      containers:
+        {{- if .Values.troubleshootingContainer }}
+        {{- include "troubleshootingContainer" . | nindent 8 }}
+        {{- end }}
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          ports:
+          - containerPort: {{ .Values.service.port }}
+          {{- include "probes" . | nindent 10 }}

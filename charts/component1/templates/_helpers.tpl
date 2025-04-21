@@ -1,0 +1,69 @@
+{{- define "troubleshootingContainer" -}}
+- name: shell
+  image: busybox:1.28
+  command: ["sleep", "3600"]
+  securityContext:
+    capabilities:
+      add:
+      - SYS_PTRACE
+  stdin: true
+  tty: true
+{{- end }}
+
+{{- define "probes" -}}
+livenessProbe:
+{{- if .Values.livenessProbe.httpGet }}
+  httpGet:
+    path: {{ .Values.livenessProbe.httpGet.path }}
+    port: {{ .Values.livenessProbe.httpGet.port | default .Values.service.port }}
+{{- end }}
+{{- if .Values.livenessProbe.tcpSocket }}
+  tcpSocket:
+    port: {{ .Values.livenessProbe.tcpSocket.port | default .Values.service.port }}
+{{- end }}
+{{- if .Values.livenessProbe.exec }}
+  exec:
+    command: {{ toJson .Values.livenessProbe.exec.command }}
+{{- end }}
+  initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+  periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+  timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+  failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+readinessProbe:
+{{- if .Values.readinessProbe.httpGet }}
+  httpGet:
+    path: {{ .Values.readinessProbe.httpGet.path }}
+    port: {{ .Values.readinessProbe.httpGet.port | default .Values.service.port }}
+{{- end }}
+{{- if .Values.readinessProbe.tcpSocket }}
+  tcpSocket:
+    port: {{ .Values.readinessProbe.tcpSocket.port | default .Values.service.port }}
+{{- end }}
+{{- if .Values.readinessProbe.exec }}
+  exec:
+    command: {{ toJson .Values.readinessProbe.exec.command }}
+{{- end }}
+  initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+  periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+  timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+  successThreshold: {{ .Values.readinessProbe.successThreshold }}
+  failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+startupProbe:
+{{- if .Values.startupProbe.httpGet }}
+  httpGet:
+    path: {{ .Values.startupProbe.httpGet.path }}
+    port: {{ .Values.startupProbe.httpGet.port | default .Values.service.port }}
+{{- end }}
+{{- if .Values.startupProbe.tcpSocket }}
+  tcpSocket:
+    port: {{ .Values.startupProbe.tcpSocket.port | default .Values.service.port }}
+{{- end }}
+{{- if .Values.startupProbe.exec }}
+  exec:
+    command: {{ toJson .Values.startupProbe.exec.command }}
+{{- end }}
+  initialDelaySeconds: {{ .Values.startupProbe.initialDelaySeconds }}
+  periodSeconds: {{ .Values.startupProbe.periodSeconds }}
+  timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds }}
+  failureThreshold: {{ .Values.startupProbe.failureThreshold }}
+{{- end }}
