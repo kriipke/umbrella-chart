@@ -1,3 +1,17 @@
+{{- define "umbrella-chart.service" -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+spec:
+  ports:
+  - port: {{ .Values.service.port }}
+  selector:
+    run: php-apache
+{{- end }}
+
 {{- define "umbrella-chart.hpa" -}}
 {{- if eq .Values.podCount.type "dynamic" }}
 apiVersion: autoscaling/v2
