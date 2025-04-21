@@ -9,7 +9,7 @@ spec:
   ports:
   - port: {{ .Values.service.port }}
   selector:
-    run: php-apache
+    app: {{ .Chart.Name }}
 {{- end }}
 
 {{- define "umbrella-chart.hpa" -}}
@@ -22,7 +22,7 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ .Values.service.name }}
+    name: {{ .Chart.Name }}
   minReplicas: {{ .Values.podCount.dynamic.minReplicas }}
   maxReplicas: {{ .Values.podCount.dynamic.maxReplicas }}
   metrics:
