@@ -1,6 +1,6 @@
 global:
-  repository: svc-devqa-harbor.lotteryplus.com/harbor/shared-services
-
+  repository: yourrepo.com
+  
 component1:
   enabled: true
 
