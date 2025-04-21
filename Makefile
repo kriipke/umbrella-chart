@@ -10,6 +10,7 @@ all: validate
 prepare:
 	@mkdir -p $(GENERATED_DIR)
 	@mkdir -p $(BASE_DIR)/tests/generated.last
+	@rm -rf $(BASE_DIR)/tests/generated.last/*
 
 # Generate manifests using helm template
 generate: prepare
