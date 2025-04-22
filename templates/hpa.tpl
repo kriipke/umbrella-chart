@@ -3,11 +3,11 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "umbrella.fullname" . }}-hpa
+  name: {{ .Chart.Name }}-hpa
   labels:
-    {{ include "umbrella.labels" . | nindent 4 }}
+    {{ include (print .Chart.Name ".labels") . | nindent 4 }}
   annotations:
-    {{ include "umbrella.annotations" . | nindent 4 }}
+    {{ include (print .Chart.Name ".annotations") . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
