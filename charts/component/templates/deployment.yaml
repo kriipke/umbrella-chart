@@ -25,6 +25,8 @@ spec:
         {{- end }}
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          {{- if .Values.service }}
           ports:
           - containerPort: {{ .Values.service.port }}
+          {{- end }}
           {{- include "probes" . | nindent 10 }}

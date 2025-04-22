@@ -1,11 +1,11 @@
 global:
   repository: yourrepo.com
   
-component1:
+component:
   enabled: true
 
   image:
-    repository: component1-app
+    repository: component-app
     tag: latest
 
   service:

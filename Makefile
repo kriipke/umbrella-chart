@@ -4,7 +4,7 @@ BASE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 GENERATED_DIR := $(BASE_DIR)tests/generated
 
 # Default target
-all: validate
+all: template
 
 # Create necessary directories
 prepare:
@@ -15,11 +15,18 @@ prepare:
 # Generate manifests using helm template
 generate: prepare
 	@cd $(BASE_DIR)
+	@KUBECTL_SLICE_OPTS=$(KUBECTL_SLICE_OPTS)
 	@echo "\nRunning helm template command to generate manifests..."
-	@helm template -g . | kubectl slice -o $(GENERATED_DIR)
+	@helm template -g . | kubectl slice -$(SLICE_OPTS)o $(GENERATED_DIR) 
 
 # Validate YAML files using kubeconform
-validate: generate
+template: 
+	@$(MAKE) KUBECTL_SLICE_OPTS="q" --no-print-directory generate
+	@cat $(GENERATED_DIR)/*
+	@$(MAKE) --no-print-directory clean
+
+# Validate YAML files using kubeconform
+test: generate
 	@echo "\nRunning kubeconform to validate manifests..."
 	@YAML_FILES=$$(find $(GENERATED_DIR) -type f -name '*.yaml'); \
 	if [ -z "$$YAML_FILES" ]; then \
