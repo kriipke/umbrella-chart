@@ -3,8 +3,8 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/kriipke/mkchart/internal/convert"
-	"github.com/kriipke/mkchart/pkg/example"
+	"github.com/kriipke/umbrella-chart/cli/internal/convert"
+	"github.com/kriipke/umbrella-chart/cli/pkg/example"
 	"github.com/spf13/cobra"
 )
 
@@ -69,3 +69,18 @@ func (o *exampleOptions) parseArgs(args []string) ([]int, error) {
 
 	return values, nil
 }
+
+
+	generateCmd := &cobra.Command{
+		Use:   "generate",
+		Short: "Generate Helm charts using config.yaml",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := generate.LoadConfig()
+			if err != nil {
+				return err
+			}
+			fmt.Printf("Loaded umbrella chart: %%s\\n", cfg.UmbrellaChartName)
+			return nil
+		},
+	}
+	rootCmd.AddCommand(generateCmd)

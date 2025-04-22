@@ -29,3 +29,25 @@ func Execute(version string) error {
 
 	return nil
 }
+
+
+var configPath string
+
+func init() {
+	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "", "Path to config file (default is ./config.yaml)")
+	cobra.OnInitialize(initConfig)
+}
+
+func initConfig() {
+	if configPath != "" {
+		viper.SetConfigFile(configPath)
+	} else {
+		viper.SetConfigName("config")
+		viper.SetConfigType("yaml")
+		viper.AddConfigPath(".")
+	}
+	if err := viper.ReadInConfig(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error reading config: %v\n", err)
+		os.Exit(1)
+	}
+}
