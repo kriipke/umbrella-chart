@@ -1,0 +1,36 @@
+---
+# Source: umbrella-chart/charts/component/templates/hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: release-name-component-component
+  labels:
+    app.kubernetes.io/name: component
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: 1.16.0
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: component-0.1.0
+    chart-name: component
+  annotations:
+    checksum/config: 671e09fda7d932e990ce9148265546a927f4689522a9ce9ff8239d99e34fb7cd
+    checksum/secrets: 2a98d056c258e8303a2ced0ea938203bf790a5aaa3068a53fb8005ccfa395258
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: release-name-component-component
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+      - type: Resource
+        resource:
+          name: memory
+          target:
+            type: Utilization
+            averageUtilization: 75
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 75
