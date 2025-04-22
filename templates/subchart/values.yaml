@@ -4,6 +4,14 @@ image:
   name: custom-service   # Optional override, defaults to .Chart.Name
   tag: "v1.2.3"          # Optional override, defaults to .Chart.AppVersion
 
+troubleshootingContainer: false
+
+environment:
+  - name: proxy-variables
+    configMap: proxy-variables
+  - name: app-secrets
+    secret: app-secret
+
 service:
   port: 8080
 
@@ -41,8 +49,6 @@ podCount:
     targetMemoryUtilizationPercentage: 75
     behavior: {}
 
-troubleshootingContainer: false
-
 livenessProbe:
   httpGet:
     path: /healthz
@@ -68,6 +74,10 @@ startupProbe:
   timeoutSeconds: 2
   failureThreshold: 5
 
+pdb:
+  enabled: true
+  minimumAvailabe: 1
+  
 networkPolicy:
   enabled: true
   ingressFrom:
@@ -83,8 +93,3 @@ volumes:
     mountPath: /etc/app/creds
     secret: app-secret
 
-environment:
-  - name: proxy-variables
-    configMap: proxy-variables
-  - name: app-secrets
-    secret: app-secret

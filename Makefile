@@ -1,0 +1,72 @@
+.PHONY: all validate clean generate-subcharts
+
+
+BASE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+GENERATED_DIR := $(BASE_DIR)output
+
+SUBCHART_YAML := config.yaml
+SUBCHARTS := $(shell yq e '.subcharts[]' $(SUBCHART_YAML))
+
+# Default target
+all: template
+
+# Create necessary directories
+prepare:
+	@mkdir -p $(GENERATED_DIR)
+	@mkdir -p $(BASE_DIR)/output
+
+# Generate manifests using helm template
+generate: prepare
+	cd $(BASE_DIR)templates/umbrella
+	echo $(BASE_DIR)templates/umbrella
+	@KUBECTL_SLICE_OPTS=$(KUBECTL_SLICE_OPTS)
+	@echo "\nRunning helm template command to generate manifests..."
+	echo $(realpath .)
+	helm template -g $(realpath .)/templates/umbrella | kubectl slice -$(SLICE_OPTS)o $(GENERATED_DIR) $(DRY_RUN) --include-triple-dash --skip-non-k8s
+
+# Validate YAML files using kubeconform
+template: 
+	@$(MAKE) KUBECTL_SLICE_OPTS="q" STDOUT="--stdout" --no-print-directory generate
+	@cat $(GENERATED_DIR)
+
+# Validate YAML files using kubeconform
+test: generate
+	@echo "\nRunning kubeconform to validate manifests..."
+	@YAML_FILES=$$(find $(GENERATED_DIR) -type f -name '*.yaml'); \
+	if [ -z "$$YAML_FILES" ]; then \
+		echo "No YAML files found to validate."; \
+	else \
+			echo "Validating $(GENERATED_DIR)..."; \
+			kubeconform -verbose -summary -output json $(GENERATED_DIR); \
+	fi
+	@echo "\nTests Complete!"
+#kubeconform -verbose -output json $$file || echo "failed to validate $$file"; \
+
+
+
+
+generate-subcharts: 
+	@echo "Using subcharts from $(SUBCHART_YAML): $(SUBCHARTS)"
+	@rm -rf $(GENERATED_DIR)/**
+
+	@echo "Generating fresh subcharts from db..."
+	@for name in $(SUBCHARTS); do \
+		echo "  - SUBCHARTS $(SUBCHARTS)"; \
+		echo "  - Creating $(BASE_DIR)charts/$$name"; \
+		cp -r $(BASE_DIR)/templates/umbrella/ "$(GENERATED_DIR)"; \
+		echo "$(GENERATED_DIR)/charts/$$name"; \
+		cp -r $(BASE_DIR)/templates/subchart/ "$(GENERATED_DIR)/charts/$$name" || echo "FAILED TO COPY SUBCHART FROM TEMPLATE"; \
+		cd $(GENERATED_DIR)/charts/$$name; \
+		find . -type f -exec sed -i '' "s/component/$$name/g" {} +;\
+	done
+	$(MAKE) generate-dependencies
+
+
+generate-dependencies:
+	@echo "Regenerating dependencies section in Chart.yaml..."
+	@CHARTFILE=$(GENERATED_DIR)/Chart.yaml; \
+	echo "apiVersion: v2" > $$CHARTFILE; \
+	yq e '.name, .description, .type, .version, .appVersion' $(BASE_DIR)/templates/umbrella/Chart.yaml | \
+	awk 'BEGIN { f=0 } { if (f==0) print; if ($$0 ~ /^dependencies:/) f=1 }' >> $$CHARTFILE; \
+	echo "dependencies:" >> $$CHARTFILE; \
+	yq e '.subcharts[] | "- name: \(.name)\n  version: \"0.1.0\"\n  repository: \"file://./charts/\(.name)\""' config.yaml >> $$CHARTFILE

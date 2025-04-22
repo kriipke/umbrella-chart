@@ -1,0 +1,7 @@
+subcharts:
+  - name: web
+    workload: deployment
+  - name: cache
+    workload: statefulset
+  - name: log-agent
+    workload: daemonset
