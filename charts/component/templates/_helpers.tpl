@@ -1,3 +1,30 @@
+{{- define "component.fullname" -}}
+{{ include "umbrella.fullname" . }}
+{{- end }}
+
+{{- define "component.labels" -}}
+{{ include "umbrella.labels" . }}
+chart-name: {{ .Chart.Name }}
+{{- if .Values.additionalLabels }}
+{{ toYaml .Values.additionalLabels | nindent 0 }}
+{{- end }}
+{{- end }}
+
+{{- define "component.annotations" -}}
+{{ include "umbrella.annotations" . }}
+{{- if .Values.additionalAnnotations }}
+{{ toYaml .Values.additionalAnnotations | nindent 0 }}
+{{- end }}
+{{- end }}
+
+{{- define "component.image" -}}
+{{- $registry := .Values.image.registry | default .Values.global.registry -}}
+{{- $name := .Values.image.name | default .Chart.Name -}}
+{{- $tag := .Values.image.tag | default .Chart.AppVersion -}}
+{{- printf "%s/%s:%s" $registry $name $tag -}}
+{{- end }}
+
+
 {{- define "troubleshootingContainer" -}}
 - name: shell
   image: busybox:1.28
