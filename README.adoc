@@ -1,0 +1,9 @@
+= Helm Chart Generator
+
+= Features
+
+* configurable via yaml file: `config.yaml`
+
+= Considerations
+
+* Each microservice is meant to run a single deployment, statefulset, or daemonset along with any "supporting" containers it needs to deploy. Adding additional microservices via additional subcharts is preferred to crowded pods.
