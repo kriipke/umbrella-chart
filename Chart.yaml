@@ -26,7 +26,7 @@ appVersion: "1.16.0"
 dependencies:
 - name: frontend
   version: "0.1.0"
-  repository: "file://./charts/component"
+  repository: "file://./charts/frontend"
 - name: cache
   version: "0.1.0"
   repository: "file://./charts/cache"
