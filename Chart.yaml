@@ -24,6 +24,12 @@ version: 0.1.0
 appVersion: "1.16.0"
 
 dependencies:
-- name: component
+- name: frontend
   version: "0.1.0"
   repository: "file://./charts/component"
+- name: cache
+  version: "0.1.0"
+  repository: "file://./charts/cache"
+- name: database
+  version: "0.1.0"
+  repository: "file://./charts/database"
