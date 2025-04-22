@@ -17,7 +17,7 @@ generate: prepare
 	@cd $(BASE_DIR)
 	@KUBECTL_SLICE_OPTS=$(KUBECTL_SLICE_OPTS)
 	@echo "\nRunning helm template command to generate manifests..."
-	@helm template -g . | kubectl slice -$(SLICE_OPTS)o $(GENERATED_DIR) 
+	@helm template -g . | kubectl slice -$(SLICE_OPTS)o $(GENERATED_DIR) --include-triple-dash
 
 # Validate YAML files using kubeconform
 template: 

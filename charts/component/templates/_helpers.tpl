@@ -1,5 +1,5 @@
 {{- define "component.fullname" -}}
-{{ include "umbrella.fullname" . }}
+{{- include "umbrella.fullname" . }}-{{ .Chart.Name }}
 {{- end }}
 
 {{- define "component.labels" -}}
