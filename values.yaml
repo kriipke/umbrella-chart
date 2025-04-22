@@ -2,7 +2,25 @@ global:
   repository: yourrepo.com
   
 component:
+  podCount:
+    type: "dynamic"
+
+database:
+  podCount:
+    type: "dynamic"
+
+cache:
+  podCount:
+    type: "dynamic"
+
+frontend:
   enabled: true
+  networkPolicy:
+    enabled: true
+    ingressFrom:
+      - podSelector:
+          matchLabels:
+            app: ingress-gateway
 
   image:
     repository: component-app
@@ -66,3 +84,4 @@ component:
     periodSeconds: 10
     timeoutSeconds: 2
     failureThreshold: 5
+

@@ -1,8 +1,8 @@
-{{- define "component.fullname" -}}
+{{- define "frontend.fullname" -}}
 {{ include "umbrella.fullname" . }}
 {{- end }}
 
-{{- define "component.labels" -}}
+{{- define "frontend.labels" -}}
 app.kubernetes.io/name: {{ .Chart.Name }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/version: {{ .Chart.AppVersion }}
@@ -14,7 +14,7 @@ chart-name: {{ .Chart.Name }}
 {{- end }}
 {{- end }}
 
-{{- define "component.annotations" -}}
+{{- define "frontend.annotations" -}}
 checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
 checksum/secrets: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
 {{- if .Values.additionalAnnotations }}
@@ -22,7 +22,7 @@ checksum/secrets: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha
 {{- end }}
 {{- end }}
 
-{{- define "component.image" -}}
+{{- define "frontend.image" -}}
 {{- $registry := .Values.image.registry | default .Values.global.repository -}}
 {{- $name := .Values.image.name | default .Chart.Name -}}
 {{- $tag := .Values.image.tag | default .Chart.AppVersion -}}

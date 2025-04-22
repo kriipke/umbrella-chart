@@ -34,7 +34,7 @@ test: generate
 	else \
 		for file in $$YAML_FILES; do \
 			echo "Validating $$file..."; \
-			/home/linuxbrew/.linuxbrew/bin/kubeconform "$$file"; \
+			kubeconform "$$file"; \
 		done; \
 	fi
 	@echo "\nTests Complete!"

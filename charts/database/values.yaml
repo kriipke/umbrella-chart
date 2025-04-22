@@ -1,4 +1,3 @@
-
 image:
   registry: ""           # Optional override, defaults to .Values.global.registry (of parent chart)
   name: custom-service   # Optional override, defaults to .Chart.Name

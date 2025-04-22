@@ -10,11 +10,11 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Chart.Name }}
+  name: {{ include (print .Chart.Name ".fullname") . }}
   labels:
-    {{ include (print .Chart.Name ".labels") . | nindent 4 }}
+    {{- include (print .Chart.Name ".labels") . | nindent 4 }}
   annotations:
-    {{ include (print .Chart.Name ".annotations") . | nindent 4 }}
+    {{- include (print .Chart.Name ".annotations") . | nindent 4 }}
     alb.ingress.kubernetes.io/scheme: {{ default "internal" .Values.ingress.aws.scheme }}
     alb.ingress.kubernetes.io/target-type: {{ default "ip" .Values.ingress.aws.targetType }}
     alb.ingress.kubernetes.io/subnets: {{ required ".Values.ingress.aws.subnet must contain values." ( .Values.ingress.aws.subnets | join "," ) }}
@@ -40,11 +40,11 @@ spec:
 apiVersion: getambassador.io/v3alpha1
 kind: Mapping
 metadata:
-  name: {{ .Chart.Name }}
+  name: {{ include (print .Chart.Name ".fullname") . }}
   labels:
-    {{ include (print .Chart.Name ".labels") . | nindent 4 }}
+    {{- include (print .Chart.Name ".labels") . | nindent 4 }}
   annotations:
-    {{ include (print .Chart.Name ".annotations") . | nindent 4 }}
+    {{- include (print .Chart.Name ".annotations") . | nindent 4 }}
     {{- if .Values.ingress.emissary.annotations }}
     {{- with .Values.ingress.emissary.annotations }}
     {{- toYaml . | nindent 4 }}

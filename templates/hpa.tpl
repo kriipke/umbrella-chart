@@ -3,16 +3,16 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ .Chart.Name }}-hpa
+  name: {{ include (print .Chart.Name ".fullname") . }}
   labels:
-    {{ include (print .Chart.Name ".labels") . | nindent 4 }}
+    {{- include (print .Chart.Name ".labels") . | nindent 4 }}
   annotations:
-    {{ include (print .Chart.Name ".annotations") . | nindent 4 }}
+    {{- include (print .Chart.Name ".annotations") . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "umbrella.fullname" . }}
+    name: {{ include (print .Chart.Name ".fullname") . }}
   minReplicas: {{ .Values.podCount.dynamic.minReplicas }}
   maxReplicas: {{ .Values.podCount.dynamic.maxReplicas }}
   metrics:
