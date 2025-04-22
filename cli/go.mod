@@ -1,4 +1,4 @@
-module github.com/kriipke/mkchart
+module github.com/kriipke/umbrella-chart
 
 go 1.19
 

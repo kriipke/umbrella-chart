@@ -1,4 +1,4 @@
-projectname?=mkchart
+projectname?=umbrella-chart
 
 default: help
 

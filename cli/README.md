@@ -7,13 +7,13 @@ A general purpose project template for golang CLI applications
 This template serves as a starting point for golang commandline applications it is based on golang projects that I consider high quality and various other useful blog posts that helped me understanding golang better.
 <br>
 <br>
-<img src="https://github.com/kriipke/mkchart/actions/workflows/test.yml/badge.svg" alt="drawing"/>
-<img src="https://github.com/kriipke/mkchart/actions/workflows/lint.yml/badge.svg" alt="drawing"/>
-<img src="https://pkg.go.dev/badge/github.com/kriipke/mkchart.svg" alt="drawing"/>
-<img src="https://codecov.io/gh/kriipke/mkchart/branch/main/graph/badge.svg" alt="drawing"/>
-<img src="https://img.shields.io/github/v/release/kriipke/mkchart" alt="drawing"/>
-<img src="https://img.shields.io/docker/pulls/kriipke/mkchart" alt="drawing"/>
-<img src="https://img.shields.io/github/downloads/kriipke/mkchart/total.svg" alt="drawing"/>
+<img src="https://github.com/kriipke/umbrella-chart/cli/actions/workflows/test.yml/badge.svg" alt="drawing"/>
+<img src="https://github.com/kriipke/umbrella-chart/cli/actions/workflows/lint.yml/badge.svg" alt="drawing"/>
+<img src="https://pkg.go.dev/badge/github.com/kriipke/umbrella-chart/cli.svg" alt="drawing"/>
+<img src="https://codecov.io/gh/kriipke/umbrella-chart/cli/branch/main/graph/badge.svg" alt="drawing"/>
+<img src="https://img.shields.io/github/v/release/kriipke/umbrella-chart/cli" alt="drawing"/>
+<img src="https://img.shields.io/docker/pulls/kriipke/umbrella-chart/cli" alt="drawing"/>
+<img src="https://img.shields.io/github/downloads/kriipke/umbrella-chart/cli/total.svg" alt="drawing"/>
 </div>
 
 # Table of Contents
@@ -42,17 +42,17 @@ This template serves as a starting point for golang commandline applications it 
 - [pre-commit-hooks](https://pre-commit.com/) for formatting and validating code before committing
 
 # Project Layout
-* [assets/](https://pkg.go.dev/github.com/kriipke/mkchart/assets) => docs, images, etc
-* [cmd/](https://pkg.go.dev/github.com/kriipke/mkchart/cmd)  => commandline configurartions (flags, subcommands)
-* [pkg/](https://pkg.go.dev/github.com/kriipke/mkchart/pkg)  => packages that are okay to import for other projects
-* [internal/](https://pkg.go.dev/github.com/kriipke/mkchart/pkg)  => packages that are only for project internal purposes
+* [assets/](https://pkg.go.dev/github.com/kriipke/umbrella-chart/cli/assets) => docs, images, etc
+* [cmd/](https://pkg.go.dev/github.com/kriipke/umbrella-chart/cli/cmd)  => commandline configurartions (flags, subcommands)
+* [pkg/](https://pkg.go.dev/github.com/kriipke/umbrella-chart/cli/pkg)  => packages that are okay to import for other projects
+* [internal/](https://pkg.go.dev/github.com/kriipke/umbrella-chart/cli/pkg)  => packages that are only for project internal purposes
 - [`tools/`](tools/) => for automatically shipping all required dependencies when running `go get` (or `make bootstrap`) such as `golang-ci-lint` (see: https://github.com/golang/go/wiki/Modules#how-can-i-track-tool-dependencies-for-a-module)
 )
 - [`scripts/`](scripts/) => build scripts 
 
 # How to use this template
 ```sh
-bash <(curl -s https://raw.githubusercontent.com/kriipke/mkchart/master/install.sh)
+bash <(curl -s https://raw.githubusercontent.com/kriipke/umbrella-chart/cli/master/install.sh)
 ```
 
 In order to make the CI work you will need to have the following Secrets in your repository defined:

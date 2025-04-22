@@ -5,7 +5,7 @@ set -euo pipefail
 read -rp "GitHub Username: " user
 read -rp "Projectname: " projectname
 
-git clone git@github.com:kriipke/mkchart.git "$projectname"
+git clone git@github.com:kriipke/umbrella-chart/cli.git "$projectname"
 cd "$projectname"
 rm -rf .git
 find . -type f -exec sed -i "s/mkchart/$projectname/g" {} +

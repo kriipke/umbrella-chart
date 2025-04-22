@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kriipke/umbrella-chart/cli/cmd"
+	"github.com/kriipke/umbrella-chart/cli"
 )
 
 var version = ""
