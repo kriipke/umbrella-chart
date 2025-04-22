@@ -26,9 +26,8 @@ generate: prepare
 	helm template -g $(realpath .)/templates/umbrella | kubectl slice -$(SLICE_OPTS)o $(GENERATED_DIR) $(DRY_RUN) --include-triple-dash --skip-non-k8s
 
 # Validate YAML files using kubeconform
-template: 
-	@$(MAKE) KUBECTL_SLICE_OPTS="q" STDOUT="--stdout" --no-print-directory generate
-	@cat $(GENERATED_DIR)
+template: generate-subcharts
+	helm template -g $(GENERATED_DIR)
 
 # Validate YAML files using kubeconform
 test: generate
