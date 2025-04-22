@@ -1,11 +1,9 @@
 {{- define "component.fullname" -}}
-{{- include "umbrella.fullname" . }}-{{ .Chart.Name }}
+{{- template "umbrella-chart.fullname" . }}-{{ .Chart.Name }}
 {{- end }}
 
 {{- define "component.labels" -}}
-app.kubernetes.io/name: {{ .Chart.Name }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-app.kubernetes.io/version: {{ .Chart.AppVersion }}
+{{- template "umbrella-chart.labels" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
 chart-name: {{ .Chart.Name }}

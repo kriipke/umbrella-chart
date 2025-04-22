@@ -27,7 +27,7 @@ generate: prepare
 
 # Validate YAML files using kubeconform
 template: generate-subcharts
-	helm template -g $(GENERATED_DIR)
+	helm template -g $(GENERATED_DIR) 
 
 # Validate YAML files using kubeconform
 test: generate
@@ -48,13 +48,16 @@ generate-subcharts:
 	@echo "Generating new Chart.yaml..."
 	@cp -r $(BASE_DIR)/templates/umbrella/* output/
 	@echo "Generating subcharts based on subcharts.yaml..."
+	yq e '.umbrellaChartName' $(BASE_DIR)config.yaml
+	echo UMBRELLA_CHART_NAME $$PCHART
 	@for line in $(SUBCHART_PAIRS); do \
 		name=$$(echo $$line | cut -f1); \
 		workload=$$(echo $$line | cut -f2); \
 		echo " - Creating subchart '$$name' with workload '$$workload'..."; \
 		cp -r templates/subchart output/charts/$$name; \
 		cd output/charts/$$name; \
-		find . -type f -exec sed -i '' "s/component/$$name/g" {} +; \
+		find $(GENERATED_DIR) -type f -exec sed -i '' "s/component/$$name/g" {} +; \
+		find $(GENERATED_DIR) -type f -exec sed -i '' 's/umbrella-chart/'$$(yq e '.umbrellaChartName' $(BASE_DIR)config.yaml)'/g' {} +; \
 		cd - > /dev/null; \
 	done
 	find  output -d 4

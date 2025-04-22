@@ -4,9 +4,9 @@ kind: Service
 metadata:
   name: {{ include (print .Chart.Name ".fullname") . }}
   labels:
-    {{- include "umbrella.labels" . | nindent 4 }}
+    {{- include (print .Chart.Name ".labels") . | nindent 4 }}
   annotations:
-    {{- include "umbrella.annotations" . | nindent 4 }}
+    {{- include (print .Chart.Name ".annotations") . | nindent 4 }}
 spec:
   ports:
     - port: {{ .Values.service.port }}

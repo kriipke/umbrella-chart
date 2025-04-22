@@ -1,4 +1,4 @@
-{{- define "umbrella.fullname" -}}
+{{- define "umbrella-chart.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{ .Values.fullnameOverride }}
 {{- else }}
@@ -6,7 +6,7 @@
 {{- end }}
 {{- end }}
 
-{{- define "umbrella.labels" -}}
+{{- define "umbrella-chart.labels" -}}
 app.kubernetes.io/name: {{ .Chart.Name }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/version: {{ .Chart.AppVersion }}
@@ -14,7 +14,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
 {{- end }}
 
-{{- define "umbrella.annotations" -}}
+{{- define "umbrella-chart.annotations" -}}
 checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
 checksum/secrets: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
 {{- end }}
