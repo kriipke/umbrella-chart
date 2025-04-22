@@ -1,3 +1,4 @@
+umbrellaChartName: umbrella-sample
 subcharts:
   - name: web
     workload: deployment
