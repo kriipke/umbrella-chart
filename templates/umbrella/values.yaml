@@ -1,87 +1,84 @@
 global:
-  repository: yourrepo.com
-  
-component:
+  repository: myregistry.io/app
+
+web:
   podCount:
-    type: "dynamic"
-
-database:
-  podCount:
-    type: "dynamic"
-
-cache:
-  podCount:
-    type: "dynamic"
-
-frontend:
-  enabled: true
-  networkPolicy:
-    enabled: true
-    ingressFrom:
-      - podSelector:
-          matchLabels:
-            app: ingress-gateway
-
+    type: dynamic
+    dynamic:
+      minReplicas: 2
+      maxReplicas: 5
+      targetCPUUtilizationPercentage: 70
   image:
-    repository: component-app
-    tag: latest
-
+    name: web-service
+    tag: "v1.0.0"
   service:
     port: 8080
-
   ingress:
     type: aws
-    host: some.host.com
-    path: /api
+    host: web.example.com
+    path: /
     aws:
       scheme: internet-facing
       subnets:
-        - subnet-xxxxxxxx
-        - subnet-yyyyyyyy
+        - subnet-aabbccdd
+        - subnet-eeffgghh
       securityGroups:
-        - sg-xxxxxxxx
-      sslCertificateArn: arn:aws:acm:region:account-id:certificate/certificate-id
+        - sg-11223344
+      sslCertificateArn: arn:aws:acm:region:account-id:certificate/cert-id
+  environment:
+    - name: env-config
+      configMap: web-config
+  volumes:
+    - name: web-assets
+      mountPath: /usr/share/web
+      configMap: web-assets
 
-  resources:
-    limits:
-      cpu: "1"
-      memory: "1G"
-    requests:
-      cpu: "0.5"
-      memory: "500Mi"
-
+cache:
   podCount:
-    type: "dynamic"
-    static: 5
-    dynamic:
-      minReplicas: 1
-      maxReplicas: 5
-      targetCPUUtilizationPercentage: 75
-      targetMemoryUtilizationPercentage: 75
-      behavior: {}
+    type: static
+    static: 1
+  image:
+    name: redis
+    tag: "6.2"
+  service:
+    port: 6379
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClassName: fast-ssd
+    mountPath: /data
+  volumes:
+    - name: redis-data
+      mountPath: /data
+      pvc:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: fast-ssd
+        resources:
+          requests:
+            storage: 1Gi
 
-  livenessProbe:
-    httpGet:
-      path: /healthz
-    initialDelaySeconds: 10
-    periodSeconds: 10
-    timeoutSeconds: 1
-    failureThreshold: 3
-
-  readinessProbe:
-    httpGet:
-      path: /ready
-    initialDelaySeconds: 5
-    periodSeconds: 10
-    timeoutSeconds: 1
-    successThreshold: 1
-    failureThreshold: 3
-
-  startupProbe:
-    httpGet:
-      path: /startup
-    initialDelaySeconds: 15
-    periodSeconds: 10
-    timeoutSeconds: 2
-    failureThreshold: 5
+log-agent:
+  image:
+    name: fluentbit
+    tag: "1.9.4"
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "200m"
+      memory: "256Mi"
+  service: null
+  podCount:
+    type: static
+    static: 1
+  environment:
+    - name: log-level
+      configMap: log-agent-config
+  volumes:
+    - name: varlog
+      mountPath: /var/log
+      hostPath:
+        path: /var/log
+        type: Directory
 

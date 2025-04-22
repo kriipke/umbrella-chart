@@ -55,7 +55,7 @@ generate-subcharts:
 		echo " - Creating subchart '$$name' with workload '$$workload'..."; \
 		cp -r templates/subchart output/charts/$$name; \
 		cd output/charts/$$name; \
-		find . -type f -exec sed -i '' "s/log-agent/$$name/g" {} +; \
+		find . -type f -exec sed -i '' "s/component/$$name/g" {} +; \
 		cd - > /dev/null; \
 	done
 	find  output -d 4
@@ -64,13 +64,10 @@ generate-subcharts:
 
 
 
+#cat $(GENERATED_DIR)/Chart.yaml | awk 'BEGIN { f=0 } { if (f==0) print; if ($$0 ~ /^dependencies:/) f=1 }' >> $$CHARTFILE; 
 generate-dependencies:
 	@echo "Regenerating dependencies section in Chart.yaml..."
-	@CHARTFILE=$(GENERATED_DIR)/Chart.yaml; \
-	cat $(GENERATED_DIR)/Chart.yaml | \
-	awk 'BEGIN { f=0 } { if (f==0) print; if ($$0 ~ /^dependencies:/) f=1 }' >> $$CHARTFILE; \
-	echo "dependencies:" >> $$CHARTFILE; \
-	yq e '.subcharts[] | "- name: $$name\n  version: \"0.1.0\"\n  repository: \"file://./charts/$$name\""' config.yaml >> $$CHARTFILE
+	yq e '.subcharts[] | [{ "name": .name,  "version": "0.1.0", "repository": "file://./charts/"+.name }]' config.yaml >> $(GENERATED_DIR)/Chart.yaml
 
 SED_I = $(shell if sed --version 2>/dev/null | grep -q GNU; then echo "-i"; else echo "-i ''"; fi)
 
