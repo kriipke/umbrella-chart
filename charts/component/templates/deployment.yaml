@@ -1,32 +1,60 @@
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Chart.Name }}
+  name: {{ include "component.fullname" . }}
+  labels:
+    {{ include "component.labels" . | nindent 4 }}
+  annotations:
+    {{ include "component.annotations" . | nindent 4 }}
 spec:
   {{- if eq .Values.podCount.type "static" }}
   replicas: {{ .Values.podCount.static }}
   {{- end }}
   selector:
     matchLabels:
-      app: {{ .Chart.Name }}
+      app: {{ include "component.fullname" . }}
   template:
     metadata:
       labels:
-        app: {{ .Chart.Name }}
+        {{ include "component.labels" . | nindent 8 }}
+      annotations:
+        {{ include "component.annotations" . | nindent 8 }}
     spec:
-      # https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/
       {{- if .Values.troubleshootingContainer }}
       shareProcessNamespace: true
+      {{- end }}
+      {{- with .Values.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
         {{- if .Values.troubleshootingContainer }}
         {{- include "troubleshootingContainer" . | nindent 8 }}
         {{- end }}
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: {{ include "component.image" . }}
           {{- if .Values.service }}
           ports:
-          - containerPort: {{ .Values.service.port }}
+            - containerPort: {{ .Values.service.port }}
           {{- end }}
           {{- include "probes" . | nindent 10 }}
+          {{- with .Values.lifecycle }}
+          lifecycle:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.secrets.enabled }}
+          volumeMounts:
+            {{- range .Values.secrets.mounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              readOnly: true
+            {{- end }}
+          {{- end }}
+      {{- if .Values.secrets.enabled }}
+      volumes:
+        {{- range .Values.secrets.mounts }}
+        - name: {{ .name }}
+          secret:
+            secretName: {{ .secretName }}
+        {{- end }}
+      {{- end }}
