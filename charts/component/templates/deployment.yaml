@@ -1,11 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "component.fullname" . }}
+  name: {{ .Chart.Name }}
   labels:
-    {{ include "component.labels" . | nindent 4 }}
+    {{ include (print .Chart.Name ".labels") . | nindent 4 }}
   annotations:
-    {{ include "component.annotations" . | nindent 4 }}
+    {{ include (print .Chart.Name ".annotations") . | nindent 4 }}
 spec:
   {{- if eq .Values.podCount.type "static" }}
   replicas: {{ .Values.podCount.static }}
@@ -16,9 +16,9 @@ spec:
   template:
     metadata:
       labels:
-        {{ include "component.labels" . | nindent 8 }}
+        {{ include (print .Chart.Name ".labels") . | nindent 4 }}
       annotations:
-        {{ include "component.annotations" . | nindent 8 }}
+        {{ include (print .Chart.Name ".annotations") . | nindent 4 }}
     spec:
       {{- if .Values.troubleshootingContainer }}
       shareProcessNamespace: true
