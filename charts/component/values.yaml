@@ -60,6 +60,10 @@ readinessProbe:
   successThreshold: 1
   failureThreshold: 3
 
+pdb:
+  enabled: true
+  minimumAvailabe: 1
+  
 startupProbe:
   httpGet:
     path: /startup
