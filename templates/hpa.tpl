@@ -3,35 +3,39 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ .Chart.Name }}
+  name: {{ include "umbrella.fullname" . }}-hpa
+  labels:
+    {{ include "umbrella.labels" . | nindent 4 }}
+  annotations:
+    {{ include "umbrella.annotations" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ .Chart.Name }}
+    name: {{ include "umbrella.fullname" . }}
   minReplicas: {{ .Values.podCount.dynamic.minReplicas }}
   maxReplicas: {{ .Values.podCount.dynamic.maxReplicas }}
   metrics:
-  {{- with .Values.podCount.dynamic.metrics }}
-    {{- toYaml . | nindent 4 }}
-  {{- else }}
-    {{- with .Values.podCount.dynamic.targetMemoryUtilizationPercentage }}
-    - type: Resource
-      resource:
-        name: memory
-        target:
-          type: Utilization
-          averageUtilization: {{ . }}
+    {{- with .Values.podCount.dynamic.metrics }}
+      {{- toYaml . | nindent 4 }}
+    {{- else }}
+      {{- with .Values.podCount.dynamic.targetMemoryUtilizationPercentage }}
+      - type: Resource
+        resource:
+          name: memory
+          target:
+            type: Utilization
+            averageUtilization: {{ . }}
+      {{- end }}
+      {{- with .Values.podCount.dynamic.targetCPUUtilizationPercentage }}
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: {{ . }}
+      {{- end }}
     {{- end }}
-    {{- with .Values.podCount.dynamic.targetCPUUtilizationPercentage }}
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: {{ . }}
-    {{- end }}
-  {{- end }}
   {{- with .Values.podCount.dynamic.behavior }}
   behavior:
     {{- toYaml . | nindent 4 }}
