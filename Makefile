@@ -5,8 +5,7 @@ BASE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 GENERATED_DIR := $(BASE_DIR)output
 
 SUBCHART_YAML := config.yaml
-SUBCHARTS := $(shell yq e '.subcharts[]' $(SUBCHART_YAML))
-
+SUBCHART_PAIRS := $(shell yq e -o=json '.subcharts[] | [.name, .workload] | @tsv' $(SUBCHART_YAML))
 UMBRELLA_NAME := $(shell yq e '.umbrellaChartName' $(SUBCHART_YAML))
 
 # Default target
@@ -45,33 +44,38 @@ test: generate
 #kubeconform -verbose -output json $$file || echo "failed to validate $$file"; \
 
 
-
-
-generate-subcharts: rename-umbrella
-	@echo "Using subcharts from $(SUBCHART_YAML): $(SUBCHARTS)"
-	@rm -rf $(GENERATED_DIR)/**
-	cp -r $(BASE_DIR)/templates/umbrella/ "$(GENERATED_DIR)"; 
-
-	@echo "Generating fresh subcharts from db..."
-	@for name in $(SUBCHARTS); do \
-		echo "  - Creating $(GENERATED_DIR)charts/$$name"; \
-		cp -r $(BASE_DIR)/templates/subchart/ "$(GENERATED_DIR)/charts/$$name" || echo "FAILED TO COPY SUBCHART FROM TEMPLATE"; \
-		cd $(GENERATED_DIR)/charts/$$name; \
-		find . -type f -exec sed -i '' "s/component/$$name/g" {} +;\
+generate-subcharts:
+	@rm -rf $(GENERATED_DIR)/*
+	@echo "Generating new Chart.yaml..."
+	@cp -r $(BASE_DIR)/templates/umbrella/* output/
+	@echo "Generating subcharts based on subcharts.yaml..."
+	@for line in $(SUBCHART_PAIRS); do \
+		name=$$(echo $$line | cut -f1); \
+		workload=$$(echo $$line | cut -f2); \
+		echo " - Creating subchart '$$name' with workload '$$workload'..."; \
+		cp -r templates/subchart output/charts/$$name; \
+		cd output/charts/$$name; \
+		find . -type f -exec sed -i '' "s/log-agent/$$name/g" {} +; \
+		cd - > /dev/null; \
 	done
+	find  output -d 4
 	$(MAKE) generate-dependencies
+
+
 
 
 generate-dependencies:
 	@echo "Regenerating dependencies section in Chart.yaml..."
 	@CHARTFILE=$(GENERATED_DIR)/Chart.yaml; \
-	echo "apiVersion: v2" > $$CHARTFILE; \
-	yq e '.name, .description, .type, .version, .appVersion' $(BASE_DIR)/templates/umbrella/Chart.yaml | \
+	cat $(GENERATED_DIR)/Chart.yaml | \
 	awk 'BEGIN { f=0 } { if (f==0) print; if ($$0 ~ /^dependencies:/) f=1 }' >> $$CHARTFILE; \
 	echo "dependencies:" >> $$CHARTFILE; \
-	yq e '.subcharts[] | "- name: \(.name)\n  version: \"0.1.0\"\n  repository: \"file://./charts/\(.name)\""' config.yaml >> $$CHARTFILE
+	yq e '.subcharts[] | "- name: $$name\n  version: \"0.1.0\"\n  repository: \"file://./charts/$$name\""' config.yaml >> $$CHARTFILE
+
+SED_I = $(shell if sed --version 2>/dev/null | grep -q GNU; then echo "-i"; else echo "-i ''"; fi)
 
 rename-umbrella:
 	@echo "Renaming umbrella chart from 'umbrella-chart' to '$(UMBRELLA_NAME)'..."
-	@find umbrella -type f \( -name "*.yaml" -o -name "*.tpl" -o -name "Makefile" \) -exec sed -i'' "s/umbrella-chart/$(UMBRELLA_NAME)/g" {} +
-	@sed -i'' "s/name: umbrella-chart/name: $(UMBRELLA_NAME)/" umbrella/Chart.yaml
+	@find output -type f \( -name "*.yaml" -o -name "*.tpl" -o -name "Makefile" \) -exec sed $(SED_I) "s/umbrella-chart/$(UMBRELLA_NAME)/g" {} +
+	@sed $(SED_I) "s/^name: umbrella-chart/name: $(UMBRELLA_NAME)/" output/Chart.yaml
+
