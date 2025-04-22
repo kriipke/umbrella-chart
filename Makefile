@@ -7,6 +7,8 @@ GENERATED_DIR := $(BASE_DIR)output
 SUBCHART_YAML := config.yaml
 SUBCHARTS := $(shell yq e '.subcharts[]' $(SUBCHART_YAML))
 
+UMBRELLA_NAME := $(shell yq e '.umbrellaChartName' $(SUBCHART_YAML))
+
 # Default target
 all: template
 
@@ -45,16 +47,14 @@ test: generate
 
 
 
-generate-subcharts: 
+generate-subcharts: rename-umbrella
 	@echo "Using subcharts from $(SUBCHART_YAML): $(SUBCHARTS)"
 	@rm -rf $(GENERATED_DIR)/**
+	cp -r $(BASE_DIR)/templates/umbrella/ "$(GENERATED_DIR)"; 
 
 	@echo "Generating fresh subcharts from db..."
 	@for name in $(SUBCHARTS); do \
-		echo "  - SUBCHARTS $(SUBCHARTS)"; \
-		echo "  - Creating $(BASE_DIR)charts/$$name"; \
-		cp -r $(BASE_DIR)/templates/umbrella/ "$(GENERATED_DIR)"; \
-		echo "$(GENERATED_DIR)/charts/$$name"; \
+		echo "  - Creating $(GENERATED_DIR)charts/$$name"; \
 		cp -r $(BASE_DIR)/templates/subchart/ "$(GENERATED_DIR)/charts/$$name" || echo "FAILED TO COPY SUBCHART FROM TEMPLATE"; \
 		cd $(GENERATED_DIR)/charts/$$name; \
 		find . -type f -exec sed -i '' "s/component/$$name/g" {} +;\
@@ -70,3 +70,8 @@ generate-dependencies:
 	awk 'BEGIN { f=0 } { if (f==0) print; if ($$0 ~ /^dependencies:/) f=1 }' >> $$CHARTFILE; \
 	echo "dependencies:" >> $$CHARTFILE; \
 	yq e '.subcharts[] | "- name: \(.name)\n  version: \"0.1.0\"\n  repository: \"file://./charts/\(.name)\""' config.yaml >> $$CHARTFILE
+
+rename-umbrella:
+	@echo "Renaming umbrella chart from 'umbrella-chart' to '$(UMBRELLA_NAME)'..."
+	@find umbrella -type f \( -name "*.yaml" -o -name "*.tpl" -o -name "Makefile" \) -exec sed -i'' "s/umbrella-chart/$(UMBRELLA_NAME)/g" {} +
+	@sed -i'' "s/name: umbrella-chart/name: $(UMBRELLA_NAME)/" umbrella/Chart.yaml
