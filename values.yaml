@@ -11,6 +11,19 @@ component:
   service:
     port: 8080
 
+  ingress:
+    type: aws
+    host: some.host.com
+    path: /api
+    aws:
+      scheme: internet-facing
+      subnets:
+        - subnet-xxxxxxxx
+        - subnet-yyyyyyyy
+      securityGroups:
+        - sg-xxxxxxxx
+      sslCertificateArn: arn:aws:acm:region:account-id:certificate/certificate-id
+
   resources:
     limits:
       cpu: "1"
