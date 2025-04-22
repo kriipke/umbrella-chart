@@ -1,0 +1,8 @@
+subcharts:
+- name: frontend
+  workload: deployment
+- name: backend
+  workload: deployment
+- name: redis
+  workload: statefulset
+umbrellaChartName: ecommerce-platform

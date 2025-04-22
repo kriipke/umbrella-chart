@@ -1,0 +1,44 @@
+global:
+  registry: yourepo.com
+
+api:
+  podCount:
+    type: dynamic
+    dynamic:
+      minReplicas: 3
+      maxReplicas: 10
+
+  image:
+    name: api-service
+    tag: v3.2
+
+  ingress:
+    type: aws
+    host: api.platform.com
+    path: /api
+
+job-runner:
+  image:
+    name: celery
+    tag: "latest"
+  podCount:
+    type: static
+    static: 2
+
+billing-db:
+  image:
+    name: postgres
+    tag: "14"
+  podCount:
+    type: static
+    static: 1
+  volumes:
+    - name: pg-data
+      mountPath: /var/lib/postgresql/data
+      pvc:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: standard
+        resources:
+          requests:
+            storage: 10Gi
+

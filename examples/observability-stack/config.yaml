@@ -1,0 +1,8 @@
+subcharts:
+- name: prometheus
+  workload: statefulset
+- name: grafana
+  workload: deployment
+- name: log-agent
+  workload: daemonset
+umbrellaChartName: observability-stack

@@ -1,0 +1,14 @@
+== ecommerce-platform
+
+A scalable e-commerce platform with frontend, backend, and Redis cache.
+
+include::ecommerce-platform/config.yaml[]
+include::ecommerce-platform/values.yaml[]
+
+== observability-stack
+
+A monitoring stack with Prometheus, Grafana, and a node-level log collector.
+
+include::observability-stack/config.yaml[]
+include::observability-stack/values.yaml[]
+

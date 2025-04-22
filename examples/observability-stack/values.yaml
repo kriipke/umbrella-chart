@@ -1,0 +1,34 @@
+global:
+  repository: docker.io/observability
+grafana:
+  image:
+    name: grafana
+    tag: 9.5.1
+  podCount:
+    static: 1
+    type: static
+  service:
+    port: 3000
+log-agent:
+  image:
+    name: fluentbit
+    tag: '2.1'
+  podCount:
+    static: 1
+    type: static
+  service: null
+  volumes:
+  - hostPath:
+      path: /var/log
+      type: Directory
+    mountPath: /var/log
+    name: varlog
+prometheus:
+  image:
+    name: prometheus
+    tag: v2.45.0
+  podCount:
+    static: 1
+    type: static
+  service:
+    port: 9090

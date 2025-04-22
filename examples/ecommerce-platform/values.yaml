@@ -1,0 +1,57 @@
+backend:
+  image:
+    name: backend-api
+    tag: v1.0.0
+  podCount:
+    dynamic:
+      maxReplicas: 4
+      minReplicas: 1
+      targetMemoryUtilizationPercentage: 80
+    type: dynamic
+  service:
+    port: 8080
+frontend:
+  image:
+    name: frontend-app
+    tag: v1.0.0
+  ingress:
+    aws:
+      scheme: internet-facing
+      securityGroups:
+      - sg-abc
+      sslCertificateArn: arn:aws:acm:region:account-id:certificate/cert-id
+      subnets:
+      - subnet-abc
+      - subnet-def
+    host: shop.example.com
+    path: /
+    type: aws
+  podCount:
+    dynamic:
+      maxReplicas: 6
+      minReplicas: 2
+      targetCPUUtilizationPercentage: 75
+    type: dynamic
+  service:
+    port: 80
+global:
+  repository: ecr.io/ecommerce
+redis:
+  image:
+    name: redis
+    tag: '7'
+  podCount:
+    static: 1
+    type: static
+  service:
+    port: 6379
+  volumes:
+  - mountPath: /data
+    name: data
+    pvc:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+      storageClassName: fast
